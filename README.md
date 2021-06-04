@@ -9,12 +9,12 @@ tqlite provides you a lightweight, replicated and fault-tolerant RDBMS cluster, 
 ### How it works
 tqlite ensures the system state is in accordance with a quorum of nodes in the cluster using [Raft](https://raft.github.io/), a well-kown concensus algorithm in a distributed system.
 ### Key features
-- Easy deployment without additionally SQLite dependency
-- Distributed consensus system
+- Lightweighted single binary
+- Easy deployment without additional SQLite dependency
 - Command line interface compatible with standard SQLite
 - Straightforward HTTP data API
+- Distributed consensus system
 - Tunable read consistency
-
 ## Quick Start
 You can start a single tqlite node first:
 ```bash
