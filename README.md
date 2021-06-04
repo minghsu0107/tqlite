@@ -12,6 +12,7 @@ tqlite ensures the system state is in accordance with a quorum of nodes in the c
 - Lightweighted single binary
 - Easy deployment without additional SQLite dependency
 - Command line interface compatible with standard SQLite
+- Support 
 - Straightforward HTTP data API
 - Distributed consensus system
 - Tunable read consistency
@@ -60,4 +61,4 @@ $ tqlite
 ## Data API
 tqlite exposes data by a rich HTTP API, allowing full control over nodes to query from or write to.
 ### In-memory databases
-To maximize the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html), meaning that there is no actual file created on the disk. The data durability is guaranteed by the journal committed by Raft. Thus the in-memory database is able to be recreated on start-up.
+To maximize the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no actual file created on the disk. The data durability is guaranteed by the journal committed by Raft, so the in-memory database is able to be recreated on start-up. However, you could enable the disk mode by adding flag `-on-disk` to `tqlited`.
