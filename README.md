@@ -72,5 +72,5 @@ $ tqlite
 You can see that tqlite client CLI is compatible with SQLite, minimizing the operation costs.
 ## Data API
 tqlite exposes data by a rich HTTP API, allowing full control over nodes to query from or write to.
-## In-memory databases
-To maximize the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no SQLite file created on the disk. The data durability is guaranteed by the journal committed by Raft, so the in-memory database is able to be recreated on start-up. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
+## In-memory store
+To maximize the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no SQLite file created on disk. The data durability is guaranteed by the journal committed by Raft, so the in-memory store is able to be recreated on start-up. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
