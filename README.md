@@ -12,7 +12,7 @@ tqlite ensures the system state is in accordance with a quorum of nodes in the c
 - Lightweighted single binary
 - Easy deployment without additional SQLite dependency
 - Command line interface compatible with standard SQLite
-- Support 
+- Support dumping, backing up, and restoring SQLite database
 - Straightforward HTTP data API
 - Distributed consensus system
 - Tunable read consistency
