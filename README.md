@@ -45,7 +45,7 @@ docker run --name node3 -p 4003:4001 --network tqlite-net minghsu0107/tqlite:v1 
 ```
 Now you have a fully replicated cluster where a majority, or a quorum, of nodes are required to reach conensus on any change to the cluster state. A quorum is is defined as `(N/2)+1` where N is the number of nodes in the cluster. In this example, a 3-node cluster is able to tolerate a single node failure.
 ### Using CLI
-Now, we are goint to insert some records to the leader node via tqlite CLI, while using **standard SQLite commands**. Once the insertion suceeds, records wil be replicated accross the entire cluster in a fault tolerant and durable manner. The 3-node cluster we have created is able to tolerant the failure of any single node without any loss of functionality or data.
+Now, we are goint to use tqlite CLI to insert some data to the leader node. tqlite is **compatible with the standard SQLite commands**. After the insertion suceeds, records will be replicated accross the entire cluster.
 ```bash
 docker exec -it node1 bash
 tqlite
