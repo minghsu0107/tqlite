@@ -1,6 +1,5 @@
 # TQLite
-*tqlite* is a distributed SQL cluster with replication, fault-tolerance, tunable consistency and leader election, using [SQLite](https://www.sqlite.org/index.html) as a single unit of node. It handles leader election gracefully using the Raft algorithm, while tolerating failures of any nodes within the cluster, including the leader.
-
+*tqlite* is a distributed SQL cluster with replication, fault-tolerance, tunable consistency and leader election. It uses [SQLite](https://www.sqlite.org/index.html), a small, fast and self-contained SQL engine, as the basic unit in the cluster.
 ## Motivation
 SQLite is a popular embedded SQL database. It is lightweight, full-featured, and easy to use. However, it is prone to single-point-of-failure due to its single-file-based nature.
 
@@ -9,10 +8,8 @@ tqlite provides you a lightweight, reliable and highly available SQL cluster, wi
 ## How it works
 tqlite ensures the system state is in accordance with a quorum of nodes in the cluster using [Raft](https://raft.github.io/), a well-kown concensus algorithm in a distributed system.
 ## Key features
-- Lightweight single binary
-- Simple deployment without additional SQLite dependency
-- CLI compatible with standard SQLite
-- Support dumping, backing up, and restoring SQLite database
+- Lightweight deployment with a single binary
+- Support dumping, backing up, and restoring database
 - Straightforward HTTP data API
 - Distributed consensus system
 - Tunable read consistency
@@ -73,4 +70,4 @@ You can see that tqlite client CLI is compatible with SQLite, minimizing the ope
 ## Data API
 tqlite exposes data by a rich HTTP API, allowing full control over nodes to query from or write to.
 ## In-memory store
-To maximize the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no SQLite file created on disk. The data durability is guaranteed by the journal committed by Raft, so the in-memory store is able to be recreated on start-up. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
+To enhance the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no actual file created on disk. The data durability is guaranteed by the journal committed by Raft, so the database is able to be recreated in the memory on restart. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
