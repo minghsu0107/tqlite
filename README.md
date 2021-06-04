@@ -1,5 +1,5 @@
 # TQLite
-*tqlite* is a distributed SQL cluster with replication, fault-tolerance, tunable consistency and leader election. It uses [SQLite](https://www.sqlite.org/index.html), a small, fast and self-contained SQL engine, as the basic unit in the cluster.
+*tqlite* is a distributed SQL database with replication, fault-tolerance, tunable consistency and leader election. It uses [SQLite](https://www.sqlite.org/index.html), a small, fast and self-contained SQL engine, as the basic unit in the cluster.
 ## Motivation
 SQLite is a popular embedded SQL database. It is lightweight, full-featured, and easy to use. However, it is prone to single-point-of-failure due to its single-file-based nature.
 
