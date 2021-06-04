@@ -1,5 +1,5 @@
 # TQLite
-*tqlite* is a distributed SQL cluster with replication, fault-tolerance, tunable consistency and leader election, using SQLite as a single unit of node. It handles leader election gracefully using the Raft algorithm, while tolerating failures of any nodes within the cluster, including the leader.
+*tqlite* is a distributed SQL cluster with replication, fault-tolerance, tunable consistency and leader election, using [SQLite](https://www.sqlite.org/index.html) as a single unit of node. It handles leader election gracefully using the Raft algorithm, while tolerating failures of any nodes within the cluster, including the leader.
 
 ## Motivation
 SQLite is a popular embedded SQL database. It is lightweight, full-featured, and easy to use. However, it is prone to single-point-of-failure due to its single-file-based nature.
@@ -9,9 +9,9 @@ tqlite provides you a lightweight, reliable and highly available SQL cluster, wi
 ## How it works
 tqlite ensures the system state is in accordance with a quorum of nodes in the cluster using [Raft](https://raft.github.io/), a well-kown concensus algorithm in a distributed system.
 ## Key features
-- Lightweighted single binary
-- Easy deployment without additional SQLite dependency
-- Command line interface compatible with standard SQLite
+- Lightweight single binary
+- Simple deployment without additional SQLite dependency
+- CLI compatible with standard SQLite
 - Support dumping, backing up, and restoring SQLite database
 - Straightforward HTTP data API
 - Distributed consensus system
