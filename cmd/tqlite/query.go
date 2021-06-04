@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/mkideal/cli"
 	"github.com/mkideal/pkg/textutil"
@@ -102,13 +101,6 @@ func queryWithClient(ctx *cli.Context, client *http.Client, argv *argT, timer bo
 		req, err := http.NewRequest("GET", urlStr, nil)
 		if err != nil {
 			return err
-		}
-		if argv.Credentials != "" {
-			creds := strings.Split(argv.Credentials, ":")
-			if len(creds) != 2 {
-				return fmt.Errorf("invalid Basic Auth credentials format")
-			}
-			req.SetBasicAuth(creds[0], creds[1])
 		}
 
 		resp, err := client.Do(req)

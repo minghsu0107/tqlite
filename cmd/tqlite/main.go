@@ -2,8 +2,6 @@
 package main
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,14 +22,11 @@ const maxRedirect = 21
 
 type argT struct {
 	cli.Helper
-	Protocol    string `cli:"s,scheme" usage:"protocol scheme (http or https)" dft:"http"`
-	Host        string `cli:"H,host" usage:"tqlited host address" dft:"127.0.0.1"`
-	Port        uint16 `cli:"p,port" usage:"tqlited host port" dft:"4001"`
-	Prefix      string `cli:"P,prefix" usage:"tqlited HTTP URL prefix" dft:"/"`
-	Insecure    bool   `cli:"i,insecure" usage:"do not verify tqlited HTTPS certificate" dft:"false"`
-	CACert      string `cli:"c,ca-cert" usage:"path to trusted X.509 root CA certificate"`
-	Credentials string `cli:"u,user" usage:"set basic auth credentials in form username:password"`
-	Version     bool   `cli:"v,version" usage:"display CLI version"`
+	Protocol string `cli:"s,scheme" usage:"protocol scheme (http or https)" dft:"http"`
+	Host     string `cli:"H,host" usage:"tqlited host address" dft:"127.0.0.1"`
+	Port     uint16 `cli:"p,port" usage:"tqlited host port" dft:"4001"`
+	Prefix   string `cli:"P,prefix" usage:"tqlited HTTP URL prefix" dft:"/"`
+	Version  bool   `cli:"v,version" usage:"display CLI version"`
 }
 
 var cliHelp = []string{
@@ -226,25 +221,8 @@ func sysdump(ctx *cli.Context, filename string, argv *argT) error {
 }
 
 func getHTTPClient(argv *argT) (*http.Client, error) {
-	var rootCAs *x509.CertPool
-
-	if argv.CACert != "" {
-		pemCerts, err := ioutil.ReadFile(argv.CACert)
-		if err != nil {
-			return nil, err
-		}
-
-		rootCAs = x509.NewCertPool()
-
-		ok := rootCAs.AppendCertsFromPEM(pemCerts)
-		if !ok {
-			return nil, fmt.Errorf("failed to parse root CA certificate(s)")
-		}
-	}
-
 	client := http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: argv.Insecure, RootCAs: rootCAs},
-		Proxy:           http.ProxyFromEnvironment,
+		Proxy: http.ProxyFromEnvironment,
 	}}
 
 	// Explicitly handle redirects.
@@ -267,13 +245,6 @@ func getVersionWithClient(client *http.Client, argv *argT) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if argv.Credentials != "" {
-		creds := strings.Split(argv.Credentials, ":")
-		if len(creds) != 2 {
-			return "", fmt.Errorf("invalid Basic Auth credentials format")
-		}
-		req.SetBasicAuth(creds[0], creds[1])
-	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -289,25 +260,9 @@ func getVersionWithClient(client *http.Client, argv *argT) (string, error) {
 
 func sendRequest(ctx *cli.Context, makeNewRequest func(string) (*http.Request, error), urlStr string, argv *argT) (*[]byte, error) {
 	url := urlStr
-	var rootCAs *x509.CertPool
-
-	if argv.CACert != "" {
-		pemCerts, err := ioutil.ReadFile(argv.CACert)
-		if err != nil {
-			return nil, err
-		}
-
-		rootCAs = x509.NewCertPool()
-
-		ok := rootCAs.AppendCertsFromPEM(pemCerts)
-		if !ok {
-			return nil, fmt.Errorf("failed to parse root CA certificate(s)")
-		}
-	}
 
 	client := http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: argv.Insecure, RootCAs: rootCAs},
-		Proxy:           http.ProxyFromEnvironment,
+		Proxy: http.ProxyFromEnvironment,
 	}}
 
 	// Explicitly handle redirects.
@@ -320,14 +275,6 @@ func sendRequest(ctx *cli.Context, makeNewRequest func(string) (*http.Request, e
 		req, err := makeNewRequest(url)
 		if err != nil {
 			return nil, err
-		}
-
-		if argv.Credentials != "" {
-			creds := strings.Split(argv.Credentials, ":")
-			if len(creds) != 2 {
-				return nil, fmt.Errorf("invalid Basic Auth credentials format")
-			}
-			req.SetBasicAuth(creds[0], creds[1])
 		}
 
 		resp, err := client.Do(req)
@@ -392,20 +339,12 @@ func cliJSON(ctx *cli.Context, cmd, line, url string, argv *argT) error {
 	}
 
 	client := http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: argv.Insecure},
-		Proxy:           http.ProxyFromEnvironment,
+		Proxy: http.ProxyFromEnvironment,
 	}}
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
-	}
-	if argv.Credentials != "" {
-		creds := strings.Split(argv.Credentials, ":")
-		if len(creds) != 2 {
-			return fmt.Errorf("invalid Basic Auth credentials format")
-		}
-		req.SetBasicAuth(creds[0], creds[1])
 	}
 
 	resp, err := client.Do(req)
@@ -441,8 +380,7 @@ func cliJSON(ctx *cli.Context, cmd, line, url string, argv *argT) error {
 func urlsToWriter(urls []string, w io.Writer, argv *argT) error {
 	client := http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: argv.Insecure},
-			Proxy:           http.ProxyFromEnvironment,
+			Proxy: http.ProxyFromEnvironment,
 		},
 		Timeout: 10 * time.Second,
 	}
@@ -455,13 +393,6 @@ func urlsToWriter(urls []string, w io.Writer, argv *argT) error {
 			req, err := http.NewRequest("GET", urls[i], nil)
 			if err != nil {
 				return err
-			}
-			if argv.Credentials != "" {
-				creds := strings.Split(argv.Credentials, ":")
-				if len(creds) != 2 {
-					return fmt.Errorf("invalid Basic Auth credentials format")
-				}
-				req.SetBasicAuth(creds[0], creds[1])
 			}
 
 			resp, err := client.Do(req)

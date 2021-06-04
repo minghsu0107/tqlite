@@ -2,12 +2,10 @@ package main
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/mkideal/cli"
 )
@@ -99,20 +97,12 @@ func makeRestoreRequest(b []byte) func(string) (*http.Request, error) {
 func restore(ctx *cli.Context, filename string, argv *argT) error {
 	statusURL := fmt.Sprintf("%s://%s:%d/status", argv.Protocol, argv.Host, argv.Port)
 	client := http.Client{Transport: &http.Transport{
-		Proxy:           http.ProxyFromEnvironment,
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: argv.Insecure},
+		Proxy: http.ProxyFromEnvironment,
 	}}
 
 	req, err := http.NewRequest("GET", statusURL, nil)
 	if err != nil {
 		return err
-	}
-	if argv.Credentials != "" {
-		creds := strings.Split(argv.Credentials, ":")
-		if len(creds) != 2 {
-			return fmt.Errorf("invalid Basic Auth credentials format")
-		}
-		req.SetBasicAuth(creds[0], creds[1])
 	}
 
 	statusResp, err := client.Do(req)

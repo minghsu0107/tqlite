@@ -49,13 +49,6 @@ func executeWithClient(ctx *cli.Context, client *http.Client, argv *argT, timer 
 		if err != nil {
 			return err
 		}
-		if argv.Credentials != "" {
-			creds := strings.Split(argv.Credentials, ":")
-			if len(creds) != 2 {
-				return fmt.Errorf("invalid Basic Auth credentials format")
-			}
-			req.SetBasicAuth(creds[0], creds[1])
-		}
 
 		resp, err := client.Do(req)
 		if err != nil {

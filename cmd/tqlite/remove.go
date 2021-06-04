@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 func removeNode(client *http.Client, id string, argv *argT, timer bool) error {
@@ -29,13 +28,6 @@ func removeNode(client *http.Client, id string, argv *argT, timer bool) error {
 		req, err := http.NewRequest("DELETE", urlStr, bytes.NewReader(b))
 		if err != nil {
 			return err
-		}
-		if argv.Credentials != "" {
-			creds := strings.Split(argv.Credentials, ":")
-			if len(creds) != 2 {
-				return fmt.Errorf("invalid Basic Auth credentials format")
-			}
-			req.SetBasicAuth(creds[0], creds[1])
 		}
 
 		resp, err := client.Do(req)
