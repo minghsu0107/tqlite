@@ -16,7 +16,7 @@ tqlite ensures the system state is in accordance with a quorum of nodes in the c
 - Straightforward HTTP data API
 - Distributed consensus system
 - Tunable read consistency
-## Quick Start
+## Quick start
 ### Installation
 Docker container is available:
 ```bash
