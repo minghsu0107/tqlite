@@ -1,14 +1,14 @@
-## TQLite
+# TQLite
 *tqlite* is a fault-tolerant distributed SQLite cluster with replication, tunable consistency and leader election. It handles leader elections gracefully using the Raft algorithm, and tolerates failures of any nodes within the cluster, including the leader.
 
-### Motivation
+## Motivation
 SQLite is a popular embedded SQL database. It is lightweight, full-featured, and easy to use. However, it is prone to single-point-of-failure due to its single-file-based nature.
 
 tqlite provides you a lightweight, replicated and fault-tolerant RDBMS cluster, with **easy deployment, and operation**. Think of tqlite as a SQL version of [etcd](https://github.com/coreos/etcd/) or [Consul](https://github.com/hashicorp/consul).
 
-### How it works
+## How it works
 tqlite ensures the system state is in accordance with a quorum of nodes in the cluster using [Raft](https://raft.github.io/), a well-kown concensus algorithm in a distributed system.
-### Key features
+## Key features
 - Lightweighted single binary
 - Easy deployment without additional SQLite dependency
 - Command line interface compatible with standard SQLite
@@ -17,6 +17,18 @@ tqlite ensures the system state is in accordance with a quorum of nodes in the c
 - Distributed consensus system
 - Tunable read consistency
 ## Quick Start
+### Installation
+Docker container is available:
+```bash
+docker pull minghsu0107/tqlite:v1
+```
+Or you could build from source:
+```bash
+git clone https://github.com/minghsu0107/tqlite.git
+go build -o tqlite -v ./cmd/tqlite
+go build -o tqlited -v ./cmd/tqlited
+```
+### Running first node
 You can start a single tqlite node first:
 ```bash
 docker network create tqlite-net
