@@ -49,7 +49,7 @@ tqlite
 ```
 ```
 $ tqlite
-127.0.0.1:4001> CREATE TABLE students (id INTEGER NOT NULL PRIMARY KEY, name TEXT)
+127.0.0.1:4001> CREATE TABLE students (id INTEGER NOT NULL PRIMARY KEY, name TEXT);
 0 row affected
 127.0.0.1:4001> .schema
 +--------------------------------------------------------------------+
@@ -57,9 +57,9 @@ $ tqlite
 +--------------------------------------------------------------------+
 | CREATE TABLE students (id INTEGER NOT NULL PRIMARY KEY, name TEXT) |
 +--------------------------------------------------------------------+
-127.0.0.1:4001> INSERT INTO students(name) VALUES("ming")
+127.0.0.1:4001> INSERT INTO students(name) VALUES("ming");
 1 row affected
-127.0.0.1:4001> SELECT * FROM students
+127.0.0.1:4001> SELECT * FROM students;
 +----+------+
 | id | name |
 +----+------+
