@@ -146,7 +146,7 @@ curl -i -XPOST 'localhost:4003/db/query?pretty&timings&level=none' -H "Content-T
 ```
 In the above query, we send read request to `node2` and will receive an instant response from `node2` without checking its leadership with other peers in the cluster.
 
-In contrast, if we send read request to the leader node with consistency level set to `strong`, tqlite will sends the request through Raft consensus system, ensuring that the node remains the leader at all times during query processing. If the node receiving the read request is a follower, the request will be redirected to the leader. However, this will involve the leader contacting at least a quorum of nodes, and will therefore increase query response times.
+In contrast, if we send read request to the leader node with consistency level set to `strong`, tqlite will read from leader node and send the request through Raft consensus system, ensuring that the **node remains the leader at all times during query processing**. If the node receiving the read request is a follower, the request will be redirected to the leader. However, this will involve the leader contacting at least a quorum of nodes, and will therefore increase query response times.
 
 Redirection example:
 ```bash
