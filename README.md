@@ -121,7 +121,7 @@ curl -XPOST 'localhost:4001/db/execute?pretty&transaction' -H "Content-Type: app
 ```
 Multiple insertions or updates in a transaction are contained within a single Raft log entry and will not be interleaved with other requests.
 ### Write Consistency
-Any write request received by followers will be fowarded to the leader. A write request received by the leader is considered successful once it replicates the data to a quorum of nodes through Raft successfully. In the below command, we send a write request to `node2`, a follower. Thus the request will be redirected to the leader:
+Any write request received by followers will be fowarded to the leader. A write request received by the leader is accepted once it replicates the data to a quorum of nodes through Raft successfully. In the below command, we send a write request to `node2`, a follower. Thus the request will be redirected to the leader:
 ```bash
 curl -i -XPOST 'localhost:4003/db/execute?pretty&timings' -H "Content-Type: application/json" -d '[
     ["INSERT INTO students(name) VALUES(?)", "bob"]
