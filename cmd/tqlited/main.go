@@ -21,17 +21,6 @@ import (
 	"github.com/minghsu0107/tqlite/tcp"
 )
 
-const logo = `
-_        _ _ _       
-| |      | (_) |      
-| |_ __ _| |_| |_ ___ 
-| __/ _| | | | __/ _ \
-| || (_| | | | ||  __/
- \__\__, |_|_|\__\___|
-       | |            
-       |_|              
-`
-
 var httpAddr string
 var httpAdv string
 var joinSrcIP string
@@ -127,15 +116,12 @@ func main() {
 
 	dataPath := flag.Arg(0)
 
-	// Display logo.
-	fmt.Println(logo)
-
 	// Configure logging and pump out initial message.
 	log.SetFlags(log.LstdFlags)
 	log.SetOutput(os.Stderr)
 	log.SetPrefix(fmt.Sprintf("[%s] ", name))
-	log.Printf("%s starting, version %s, commit %s, branch %s", name, cmd.Version, cmd.Commit, cmd.Branch)
-	log.Printf("%s, target architecture is %s, operating system target is %s", runtime.Version(), runtime.GOARCH, runtime.GOOS)
+	// log.Printf("%s starting, version %s, commit %s, branch %s", name, cmd.Version, cmd.Commit, cmd.Branch)
+	// log.Printf("%s, target architecture is %s, operating system target is %s", runtime.Version(), runtime.GOARCH, runtime.GOOS)
 	log.Printf("launch command: %s", strings.Join(os.Args, " "))
 
 	// Start requested profiling.
