@@ -68,6 +68,102 @@ $ tqlite
 ```
 You can see that tqlite client CLI is compatible with SQLite, minimizing the operation costs.
 ## Data API
-tqlite exposes data by a rich HTTP API, allowing full control over nodes to query from or write to.
+Inspired by Elasticsearch, tqlite exposes data by a rich HTTP API, allowing full control over nodes to query from or write to. We could use HTTP API to do CRUD operations with tunable consistency. Take above `students` table as an example:
+```bash
+# query
+curl -XPOST 'localhost:4001/db/query?pretty&timings' -H "Content-Type: application/json" -d '[
+    "SELECT * FROM students"
+]'
+```
+Query result:
+```
+{
+    "results": [
+        {
+            "columns": [
+                "id",
+                "name"
+            ],
+            "types": [
+                "integer",
+                "text"
+            ],
+            "values": [
+                [
+                    1,
+                    "ming"
+                ]
+            ],
+            "time": 0.000053034
+        }
+    ],
+    "time": 0.000098828
+}
+```
+
+In addition, you could pass parameterized statements to avoid SQL injections:
+```bash
+# write
+curl -XPOST 'localhost:4001/db/execute?pretty&timings' -H "Content-Type: application/json" -d '[
+    ["INSERT INTO students(name) VALUES(?)", "alice"]
+]'
+# read
+curl -XPOST 'localhost:4001/db/query?pretty&timings' -H "Content-Type: application/json" -d '[
+    ["SELECT * FROM students WHERE name=?", "alice"]
+]'
+```
+You could start a transaction by adding `transaction` query parameter:
+```bash
+curl -XPOST 'localhost:4001/db/execute?pretty&transaction' -H "Content-Type: application/json" -d "[
+    \"INSERT INTO students(name) VALUES('alan')\",
+    \"INSERT INTO students(name) VALUES('monica')\"
+]"
+```
+Multiple insertions or updates in a transaction are contained within a single Raft log entry and will not be interleaved with other requests.
+### Write Consistency
+Any write request received by followers will be fowarded to the leader. A write request received by the leader is considered successful once it replicates the data to a quorum of nodes through Raft successfully. In the below command, we send a write request to `node2`, a follower. Thus the request will be redirected to the leader:
+```bash
+curl -i -XPOST 'localhost:4003/db/execute?pretty&timings' -H "Content-Type: application/json" -d '[
+    ["INSERT INTO students(name) VALUES(?)", "bob"]
+]'
+```
+Result:
+```
+HTTP/1.1 301 Moved Permanently
+Content-Type: application/json; charset=utf-8
+Location: http://localhost:4001/db/execute?pretty&timings
+X-Tqlite-Version: 1
+Date: Mon, 07 Jun 2021 17:25:13 GMT
+Content-Length: 0
+```
+Then it is up the clients to re-issue the query command to the leader.
+### Read Consistency
+As for read operations, query with consistency level `none` will result in a local read. That is, the node simply queries its local SQLite database directly. In HTTP data API, We should set the query string parameter `level` to `none` to enable it:
+```bash
+curl -i -XPOST 'localhost:4003/db/query?pretty&timings&level=none' -H "Content-Type: application/json" -d '[
+    ["SELECT * FROM students WHERE name=?", "alice"]
+]'
+```
+In the above query, we send read request to `node2` and will receive an instant response from `node2` without checking its leadership with other peers in the cluster.
+
+In contrast, if we set consistency level to `strong`, tqlite will sends the request through Raft consensus system, ensuring that the node remains the leader at all times during query processing. If the node receiving the read request is a follower, the request will be redirected to the current leader.  When the leader receives a read request, it will query its local database, which is considered a "source of truth" in a tqlite cluster. 
+
+However, this will involve the leader contacting at least a quorum of nodes, and will therefore increase query response times.
+
+For example:
+```bash
+curl -i -XPOST 'localhost:4003/db/query?pretty&timings&level=strong' -H "Content-Type: application/json" -d '[
+    ["SELECT * FROM students WHERE name=?", "alice"]
+]'
+```
+Result:
+```
+HTTP/1.1 301 Moved Permanently
+Content-Type: application/json; charset=utf-8
+Location: http://localhost:4001/db/query?pretty&timings&level=strong
+X-Tqlite-Version: 1
+Date: Mon, 07 Jun 2021 17:25:57 GMT
+Content-Length: 0
+```
 ## In-memory store
 To enhance the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no actual file created on disk. The data durability is guaranteed by the journal committed by Raft, so the database is able to be recreated in the memory on restart. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
