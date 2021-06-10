@@ -164,4 +164,4 @@ Date: Mon, 07 Jun 2021 17:25:57 GMT
 Content-Length: 0
 ```
 ## In-memory store
-To enhance the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no actual file created on disk. The data durability is guaranteed by the journal committed by Raft, so the database is able to be recreated in the memory on restart. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
+To enhance the performance, tqlite runs SQLite [in-memory](https://www.sqlite.org/inmemorydb.html) by default, meaning that there is no actual file created on disk. The data durability is guaranteed by the Raft journal, so the database could be recreated in the memory on restart. However, you could still enable the disk mode by adding flag `-on-disk` to `tqlited`.
