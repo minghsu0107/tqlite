@@ -148,7 +148,7 @@ In the above query, we send read request to `node2` and will receive an instant 
 
 If we send read request to the leader node with consistency level set to `weak`, which is the **default** consistency level, tqlite will instruct the leader to check its local state that it is the leader before querying local SQLite database. If the node receiving the read request is a follower, the request will be redirected to the leader. However, a very small window of time (milliseconds by default) during which the node may return stale data. This is because after the leader check, but before querying local SQLite database, another node could be elected Leader and make changes to the cluster.
 
-If we send read request to the leader node with consistency level set to `strong`, tqlite will read from leader node and send the request through Raft consensus system, ensuring that the **node remains the leader at all times during query processing**. If the node receiving the read request is a follower, the request will be redirected to the leader. However, this will involve the leader contacting at least a quorum of nodes, and will therefore increase query response times.
+If we send read request to the leader node with consistency level set to `strong`, tqlite will read from leader node and send the request through Raft consensus system, ensuring that the **node remains the leader at all times during query processing**. If the node receiving the read request is a follower, the request will be redirected to the leader. The `strong` consistency solves the issue associated with `weak` consistency. However, this will involve the leader contacting at least a quorum of nodes, and will therefore increase query response times.
 
 Redirection example:
 ```bash
