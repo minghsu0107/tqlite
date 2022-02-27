@@ -1006,7 +1006,7 @@ func prettyEnabled(e bool) string {
 // NormalizeAddr ensures that the given URL has a HTTP protocol prefix.
 // If none is supplied, it prefixes the URL with "http://".
 func NormalizeAddr(addr string) string {
-	if !strings.HasPrefix(addr, "http://") && !strings.HasPrefix(addr, "https://") {
+	if !strings.HasPrefix(addr, "http://") {
 		return fmt.Sprintf("http://%s", addr)
 	}
 	return addr

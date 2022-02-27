@@ -9,11 +9,10 @@ import (
 	"log"
 	"net"
 	"os"
-	"strconv"
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 // stats captures stats for the Cluster service.
@@ -56,7 +55,6 @@ type Service struct {
 	timeout time.Duration
 
 	mu      sync.RWMutex
-	https   bool   // Serving HTTPS?
 	apiAddr string // host:port this node serves the HTTP API.
 
 	logger *log.Logger
@@ -88,13 +86,6 @@ func (s *Service) Close() error {
 // Addr returns the address the service is listening on.
 func (s *Service) Addr() string {
 	return s.addr.String()
-}
-
-// EnableHTTPS tells the cluster service the API serves HTTPS.
-func (s *Service) EnableHTTPS(b bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.https = b
 }
 
 // SetAPIAddr sets the API address the cluster service returns.
@@ -162,7 +153,6 @@ func (s *Service) Stats() (map[string]interface{}, error) {
 	st := map[string]interface{}{
 		"addr":     s.addr.String(),
 		"timeout":  s.timeout.String(),
-		"https":    strconv.FormatBool(s.https),
 		"api_addr": s.apiAddr,
 	}
 
@@ -210,9 +200,6 @@ func (s *Service) handleConn(conn net.Conn) {
 
 		a := &Address{}
 		scheme := "http"
-		if s.https {
-			scheme = "https"
-		}
 		a.Url = fmt.Sprintf("%s://%s", scheme, s.apiAddr)
 
 		b, err = proto.Marshal(a)

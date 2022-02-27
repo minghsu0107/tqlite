@@ -22,7 +22,7 @@ const maxRedirect = 21
 
 type argT struct {
 	cli.Helper
-	Protocol string `cli:"s,scheme" usage:"protocol scheme (http or https)" dft:"http"`
+	Protocol string `cli:"s,scheme" usage:"protocol scheme" dft:"http"`
 	Host     string `cli:"H,host" usage:"tqlited host address" dft:"127.0.0.1"`
 	Port     uint16 `cli:"p,port" usage:"tqlited host port" dft:"4001"`
 	Prefix   string `cli:"P,prefix" usage:"tqlited HTTP URL prefix" dft:"/"`
