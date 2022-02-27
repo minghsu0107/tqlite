@@ -1,4 +1,4 @@
-FROM golang:1.15.2 AS builder
+FROM golang:1.17 AS builder
 
 RUN mkdir -p /src
 WORKDIR /src
@@ -12,7 +12,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o tqlite -v ./cmd/tqlite
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags "-extldflags -static" -o tqlited -v ./cmd/tqlited
 
-FROM alpine:3.12
+FROM alpine:3.14
 
 COPY --from=builder /src/tqlite /src/tqlited /usr/local/bin/
 RUN apk add --no-cache bash
