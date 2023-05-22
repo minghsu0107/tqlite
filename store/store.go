@@ -104,6 +104,7 @@ const (
 )
 
 // Store is a SQLite database, where all changes are made via Raft consensus.
+// It should implement the Raft FSM interface: https://pkg.go.dev/github.com/hashicorp/raft#FSM
 type Store struct {
 	raftDir string
 
