@@ -29,16 +29,16 @@ go build -o tqlited -v ./cmd/tqlited
 You can start a single tqlite node first:
 ```bash
 docker network create tqlite-net
-docker run --name node1 -p 4001:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 1 -http-addr 0.0.0.0:4001 -raft-addr node1:4002
+docker run --name node1 -p 4001:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 1 -http-addr 0.0.0.0:4001 -http-adv-addr localhost:4001 -raft-addr 0.0.0.0:4002 -raft-adv-addr node1:4002
 ```
 
 This single node becomes the leader automatically. You can pass `-h` to `tqlited` to list all configuration options.
 ### Joining a cluster
 To be fault-tolerant, we could run tqlite in the cluster mode. For example, we could join the second and third node to the cluster by simply running:
 ```bash
-docker run --name node2 -p 4002:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 2 -http-addr 0.0.0.0:4001 -raft-addr node2:4002 -join http://node1:4001
+docker run --name node2 -p 4011:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 2 -http-addr 0.0.0.0:4001 -http-adv-addr localhost:4011 -raft-addr 0.0.0.0:4002 -raft-adv-addr node2:4002 -join http://node1:4001
 
-docker run --name node3 -p 4003:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 3 -http-addr 0.0.0.0:4001 -raft-addr node3:4002 -join http://node1:4001
+docker run --name node3 -p 4021:4001 --network tqlite-net minghsu0107/tqlite:v1 -node-id 3 -http-addr 0.0.0.0:4001 -http-adv-addr localhost:4021 -raft-addr 0.0.0.0:4002 -raft-adv-addr node3:4002 -join http://node1:4001
 ```
 Now you have a fully replicated cluster where a majority, or a quorum, of nodes are required to reach conensus on any change to the cluster state. A quorum is is defined as `(N/2)+1` where N is the number of nodes in the cluster. In this example, a 3-node cluster is able to tolerate a single node failure.
 ### Using client CLI
@@ -123,7 +123,7 @@ Multiple insertions or updates in a transaction are contained within a single Ra
 ### Write Consistency
 Any write request received by followers will be fowarded to the leader. A write request received by the leader is accepted once it replicates the data to a quorum of nodes through Raft successfully. In the below command, we send a write request to `node2`, a follower. Thus the request will be redirected to the leader:
 ```bash
-curl -i -XPOST 'localhost:4003/db/execute?pretty&timings' -H "Content-Type: application/json" -d '[
+curl -i -XPOST 'localhost:4021/db/execute?pretty&timings' -H "Content-Type: application/json" -d '[
     ["INSERT INTO students(name) VALUES(?)", "bob"]
 ]'
 ```
@@ -140,7 +140,7 @@ Then it is up the clients to re-issue the query command to the leader.
 ### Read Consistency
 As for read operations, query with consistency level `none` will result in a local read. That is, the node simply queries its local SQLite database directly. In HTTP data API, We should set the query string parameter `level` to `none` to enable it:
 ```bash
-curl -i -XPOST 'localhost:4003/db/query?pretty&timings&level=none' -H "Content-Type: application/json" -d '[
+curl -i -XPOST 'localhost:4021/db/query?pretty&timings&level=none' -H "Content-Type: application/json" -d '[
     ["SELECT * FROM students WHERE name=?", "alice"]
 ]'
 ```
@@ -152,7 +152,7 @@ If we send read request to the leader node with consistency level set to `strong
 
 Redirection example:
 ```bash
-curl -i -XPOST 'localhost:4003/db/query?pretty&timings&level=strong' -H "Content-Type: application/json" -d '[
+curl -i -XPOST 'localhost:4021/db/query?pretty&timings&level=strong' -H "Content-Type: application/json" -d '[
     ["SELECT * FROM students WHERE name=?", "alice"]
 ]'
 ```
